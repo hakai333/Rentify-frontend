@@ -1,13 +1,14 @@
-package cl.MyMGroup.rentify.ui.navigation
+package cl.MyMGroup.rentify.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import cl.MyMGroup.rentify.ui.screens.home.HomeScreen
-import cl.MyMGroup.rentify.ui.screens.login.LoginScreen
-import cl.MyMGroup.rentify.ui.screens.registro.RegistroScreen
-import cl.MyMGroup.rentify.ui.screens.venta.VentaScreen
+import cl.MyMGroup.rentify.view.CarritoScreen
+import cl.MyMGroup.rentify.view.HomeScreen
+import cl.MyMGroup.rentify.view.LoginScreen
+import cl.MyMGroup.rentify.view.RegistroScreen
+
 
 @Composable
 fun AppNavigation() {
@@ -19,8 +20,8 @@ fun AppNavigation() {
     ) {
         composable("login") { LoginScreen() }
         composable("registro") { RegistroScreen() }
-        composable("home") { HomeScreen() }
-        composable("venta") { VentaScreen() }
+        composable("home") { HomeScreen(navController) }
+        composable("carrito") { CarritoScreen() }
     }
 
 }

@@ -1,4 +1,4 @@
-package cl.MyMGroup.rentify.ui.screens.login
+package cl.MyMGroup.rentify.view
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,13 +18,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun LoginScreen(){
-    //Todo en rojo son errores!
-
     var user by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
 
@@ -32,7 +32,8 @@ fun LoginScreen(){
         // Propiedades
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize().padding(10.dp)
+        modifier = Modifier.fillMaxSize().padding(10.dp),
+
     ) {
         //Contenedores
         OutlinedTextField(
@@ -52,7 +53,10 @@ fun LoginScreen(){
         )
         Spacer(modifier = Modifier.height(8.dp))
         Button(
-            onClick = {},
+            onClick = {
+
+
+            },
             //Bordes del boton
             shape = RoundedCornerShape(5.dp),
             //Modificamos la altura a 55dp y llenamosMaximoAncho
@@ -61,4 +65,14 @@ fun LoginScreen(){
             Text("Ingresar")
         }
     }
+}
+
+@Preview(
+    name = "Pantalla login",
+    showBackground = true,
+    backgroundColor = 0xFFF5F5F5
+)
+@Composable
+fun PreviewLogin() {
+    LoginScreen()
 }
