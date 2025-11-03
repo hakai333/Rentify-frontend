@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @Composable
-fun CarritoScreen(navController: NavController) {
+fun CarpasScreen(navController: NavController) {
     Scaffold(
         content = { padding ->
             Box(

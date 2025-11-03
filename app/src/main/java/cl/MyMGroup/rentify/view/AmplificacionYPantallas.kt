@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @Composable
-fun CarritoScreen(navController: NavController) {
+fun AmplificacionYPantallas(navController: NavController) {
     Scaffold(
         content = { padding ->
             Box(
@@ -56,4 +56,5 @@ fun CarritoScreen(navController: NavController) {
             }
         }
     )
+
 }
