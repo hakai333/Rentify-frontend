@@ -7,7 +7,6 @@ import cl.MyMGroup.rentify.data.dataBase.RentifyDataBase
 import cl.MyMGroup.rentify.data.entity.PackEntity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import androidx.lifecycle.viewModelScope
 import androidx.room.Room
 import kotlinx.coroutines.flow.StateFlow
 

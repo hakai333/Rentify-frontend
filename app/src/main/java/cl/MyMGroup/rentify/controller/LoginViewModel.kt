@@ -13,7 +13,9 @@ class LoginViewModel: ViewModel() {
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle);
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow();
 
-    fun login(email: String, password: String) {
+    fun login(
+        email: String,
+        password: String) {
         viewModelScope.launch {
             _loginState.value = LoginState.Loading;
             kotlinx.coroutines.delay(1500);
