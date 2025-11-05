@@ -2,18 +2,22 @@ package cl.MyMGroup.rentify.controller
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cl.MyMGroup.rentify.data.dao.UsuarioDao
+import cl.MyMGroup.rentify.data.entity.UsuarioEntity
+import cl.MyMGroup.rentify.data.repository.UsuarioRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class RegistroViewModel : ViewModel() {
+class RegistroViewModel(private val repository: UsuarioRepository) : ViewModel() {
 
     private val _registroState = MutableStateFlow<RegistroState>(RegistroState.Idle)
     val registroState: StateFlow<RegistroState> = _registroState.asStateFlow()
 
     fun registrarUsuario(
         nombre: String,
+        apellido: String,
         email: String,
         password: String,
         confirmarPassword: String
@@ -22,7 +26,7 @@ class RegistroViewModel : ViewModel() {
             _registroState.value = RegistroState.Loading
 
             // Validaciones
-            if (nombre.isEmpty() || email.isEmpty() || password.isEmpty() || confirmarPassword.isEmpty()) {
+            if (nombre.isEmpty() || apellido.isEmpty() || email.isEmpty() || password.isEmpty() || confirmarPassword.isEmpty()) {
                 _registroState.value = RegistroState.Error("Todos los campos son obligatorios")
                 return@launch
             }
@@ -37,8 +41,23 @@ class RegistroViewModel : ViewModel() {
                 return@launch
             }
 
+            if (!email.contains("@")) {
+                _registroState.value = RegistroState.Error("Correo invalido")
+                return@launch
+            }
+
+            val nuevoUsuario = UsuarioEntity(
+                nombre = nombre,
+                apellido = apellido,
+                email = email,
+                password = password
+            )
+
+            repository.insertarUsuario(nuevoUsuario)
+
+
             // Simulación de registro exitoso
-            kotlinx.coroutines.delay(1500)
+            kotlinx.coroutines.delay(500)
             _registroState.value = RegistroState.Success
         }
     }

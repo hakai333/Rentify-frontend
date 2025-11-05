@@ -1,30 +1,61 @@
 package cl.MyMGroup.rentify.controller
 
-import android.os.Message
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.room.Room
+import cl.MyMGroup.rentify.data.dao.UsuarioDao
+import cl.MyMGroup.rentify.data.dataBase.RentifyDataBase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class LoginViewModel: ViewModel() {
+
+class LoginViewModel(application: Application): AndroidViewModel(application){
+
+    private val db = Room.databaseBuilder(
+        application,
+        RentifyDataBase::class.java,
+        "rentify_db"
+    ).build()
+
+    private val usuarioDao: UsuarioDao = db.usuarioDao()
+
 
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle);
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow();
 
     fun login(
         email: String,
-        password: String) {
-        viewModelScope.launch {
+        password: String
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
             _loginState.value = LoginState.Loading;
-            kotlinx.coroutines.delay(1500);
+            try {
+                // Validaciones
+                val usuario = usuarioDao.getUsuario(email, password);
+                withContext(Dispatchers.Main) {
+                    if(usuario != null) {
+                        _loginState.value = LoginState.Success;
+                        kotlinx.coroutines.delay(500);
+                    } else {
+                        _loginState.value = LoginState.Error("Credenciales invalidas!")
+                    }
+                }
 
-            if( email.isNotEmpty() && password.length >= 6 ) {
-                _loginState.value = LoginState.Success;
-            } else {
-                _loginState.value = LoginState.Error("Credenciales invalidas!")
+
+
+
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    _loginState.value = LoginState.Error("Error al acceder a la base de datos")
+                }
             }
+
 
         }
     }

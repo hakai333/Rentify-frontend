@@ -1,37 +1,39 @@
-    package cl.MyMGroup.rentify.data.dataBase
-    
-    import android.content.Context
-    import androidx.room.Database
-    import androidx.room.Room
-    import androidx.room.RoomDatabase
-    import cl.MyMGroup.rentify.data.dao.CartDao
-    import cl.MyMGroup.rentify.data.dao.PackDao
-    import cl.MyMGroup.rentify.data.entity.CartItemEntity
-    import cl.MyMGroup.rentify.data.entity.PackEntity
-    
-    @Database(entities = [PackEntity::class,
-        CartItemEntity::class],
-        version = 1,
-        exportSchema = false)
-    abstract class RentifyDataBase : RoomDatabase() {
-        abstract fun packDao(): PackDao
-        abstract fun cartDao(): CartDao
+package cl.MyMGroup.rentify.data.dataBase
 
+import android.content.Context
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import cl.MyMGroup.rentify.data.dao.PackDao
+import cl.MyMGroup.rentify.data.dao.UsuarioDao
+import cl.MyMGroup.rentify.data.entity.PackEntity
+import cl.MyMGroup.rentify.data.entity.UsuarioEntity
 
-        companion object{
-            @Volatile
-            private  var INSTANCE: RentifyDataBase? = null
+@Database(
+    entities = [PackEntity::class, UsuarioEntity::class],
+    version = 5,
+    exportSchema = false
+)
+abstract class RentifyDataBase : RoomDatabase() {
+    abstract fun packDao(): PackDao
+    abstract fun usuarioDao(): UsuarioDao
 
-            fun getDataBase(context: Context): RentifyDataBase{
-                return INSTANCE ?: synchronized(this){
-                    val instance = Room.databaseBuilder(
-                        context.applicationContext,
-                        RentifyDataBase::class.java,
-                        "rentify_database"
-                    ).build()
-                    INSTANCE = instance
-                    instance
-                }
+    companion object {
+        @Volatile
+        private var INSTANCE: RentifyDataBase? = null
+
+        fun genInstance(context: Context): RentifyDataBase {
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    RentifyDataBase::class.java,
+                    "rentify_db"
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
+                INSTANCE = instance
+                instance
             }
         }
     }
+}

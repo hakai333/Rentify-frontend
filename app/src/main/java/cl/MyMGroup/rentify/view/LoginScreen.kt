@@ -53,7 +53,6 @@ fun LoginScreen(
     var localErrorMessage by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
-    val viewModel: LoginViewModel = viewModel();
     val loginState by viewModel.loginState.collectAsState();
 
 
@@ -69,25 +68,6 @@ fun LoginScreen(
             }
             else -> { }
         }
-    }
-
-    //Funcion para validar y hacer login
-    fun performLogin() {
-        // PRIMERA VALIDACIÓN: Campos vacíos
-        if (email.isEmpty() || pass.isEmpty()) {
-            localErrorMessage = "Por favor completa todos los campos"
-            return
-        }
-
-        // SEGUNDA VALIDACIÓN: Contraseña muy corta
-        if (pass.length < 6) {
-            localErrorMessage = "La contraseña debe tener al menos 6 caracteres"
-            return
-        }
-
-        // SI PASÓ TODAS LAS VALIDACIONES:
-        localErrorMessage = "" // Limpia
-        viewModel.login(email, pass) // Llama al ViewModel para hacer login
     }
 
     val isLoading = loginState is LoginState.Loading
@@ -143,7 +123,8 @@ fun LoginScreen(
             visualTransformation = PasswordVisualTransformation()
         )
 
-        //Mensaje de error
+        Spacer(modifier = Modifier.height(20.dp))
+
         if ( localErrorMessage.isNotEmpty() ) {
             Text(
                 text = localErrorMessage,
@@ -152,10 +133,8 @@ fun LoginScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
-
         Button(
-            onClick = { performLogin() },
+            onClick = { viewModel.login(email, pass) },
             shape = RoundedCornerShape(5.dp),
             modifier = Modifier.height(55.dp)
                 .height(50.dp)
