@@ -1,6 +1,9 @@
 package cl.MyMGroup.rentify.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import cl.MyMGroup.rentify.view.CarritoScreen
@@ -9,6 +12,10 @@ import cl.MyMGroup.rentify.view.LoginScreen
 import cl.MyMGroup.rentify.view.RegistroScreen
 import cl.MyMGroup.rentify.view.DecoracionFloralScreen
 import androidx.navigation.compose.NavHost
+import cl.MyMGroup.rentify.data.dao.UsuarioDao
+import cl.MyMGroup.rentify.data.dataBase.RentifyDataBase
+import cl.MyMGroup.rentify.data.repository.UsuarioRepository
+import cl.MyMGroup.rentify.ui.theme.RentifyTheme
 import cl.MyMGroup.rentify.view.AmplificacionYPantallas
 import cl.MyMGroup.rentify.view.BanqueteriaScreen
 import cl.MyMGroup.rentify.view.CarpasScreen
@@ -19,6 +26,14 @@ import cl.MyMGroup.rentify.view.ParcelasScreen
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
+
+    val context = LocalContext.current;
+    val database = remember {
+        RentifyDataBase.genInstance(context)
+    }
+
+
+    val repository = remember { UsuarioRepository(database.usuarioDao()) }
 
     NavHost(
         navController = navController,

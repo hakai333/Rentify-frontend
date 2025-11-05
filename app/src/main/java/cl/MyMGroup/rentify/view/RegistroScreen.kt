@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -14,27 +15,44 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import cl.MyMGroup.rentify.controller.RegistroViewModel
 import cl.MyMGroup.rentify.controller.RegistroState
+import cl.MyMGroup.rentify.controller.RegistroViewModelFactory
+import cl.MyMGroup.rentify.data.dataBase.RentifyDataBase
+import cl.MyMGroup.rentify.data.repository.UsuarioRepository
 
 @Composable
 fun RegistroScreen(
     onRegistroSuccess: () -> Unit,
-    onNavigateToLogin: () -> Unit,
-    viewModel: RegistroViewModel = viewModel()
+    onNavigateToLogin: () -> Unit
 ) {
+
+    val context = LocalContext.current
+    val database = remember { RentifyDataBase.genInstance(context) }
+    val repository = remember { UsuarioRepository(database.usuarioDao()) }
+
+    val viewModel: RegistroViewModel = viewModel(
+        factory = RegistroViewModelFactory(repository)
+    )
+
+    val registroState by viewModel.registroState.collectAsState();
+
     var nombre by remember { mutableStateOf("") }
+    var apellido by remember { mutableStateOf("" ) }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmarPassword by remember { mutableStateOf("") }
     var localErrorMessage by remember { mutableStateOf("") }
 
-    val registroState by viewModel.registroState.collectAsState()
+
+
+
 
     // Manejar el estado del registro
     LaunchedEffect(registroState) {
-        when (registroState) {
+        when(registroState) {
             is RegistroState.Success -> {
-                onRegistroSuccess()
+                kotlinx.coroutines.delay(1500)
                 viewModel.resetState()
+                onRegistroSuccess()
             }
             is RegistroState.Error -> {
                 localErrorMessage = (registroState as RegistroState.Error).message
@@ -43,23 +61,7 @@ fun RegistroScreen(
         }
     }
 
-    // Función para validar y hacer registro
-    fun performRegistro() {
-        if (nombre.isEmpty() || email.isEmpty() || password.isEmpty() || confirmarPassword.isEmpty()) {
-            localErrorMessage = "Por favor completa todos los campos"
-            return
-        }
-        if (password != confirmarPassword) {
-            localErrorMessage = "Las contraseñas no coinciden"
-            return
-        }
-        if (password.length < 6) {
-            localErrorMessage = "La contraseña debe tener al menos 6 caracteres"
-            return
-        }
-        localErrorMessage = ""
-        viewModel.registrarUsuario(nombre, email, password, confirmarPassword)
-    }
+
 
     val isLoading = registroState is RegistroState.Loading
 
@@ -79,14 +81,27 @@ fun RegistroScreen(
             modifier = Modifier.padding(bottom = 32.dp)
         )
 
-        // Campo Nombre
+
         OutlinedTextField(
             value = nombre,
             onValueChange = {
                 nombre = it
                 if (localErrorMessage.isNotEmpty()) localErrorMessage = ""
             },
-            label = { Text("Nombre completo") },
+            label = { Text("Nombre") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading
+        )
+
+
+        OutlinedTextField(
+            value = apellido,
+            onValueChange = {
+                apellido = it
+                if (localErrorMessage.isNotEmpty()) localErrorMessage = ""
+            },
+            label = { Text("Apellido") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             enabled = !isLoading
@@ -152,7 +167,15 @@ fun RegistroScreen(
 
         // Botón de Registro
         Button(
-            onClick = { performRegistro() },
+            onClick = {
+                viewModel.registrarUsuario(
+                    nombre,
+                    apellido,
+                    email,
+                    password,
+                    confirmarPassword
+                )
+                      },
             shape = RoundedCornerShape(5.dp),
             modifier = Modifier
                 .height(55.dp)
@@ -189,6 +212,11 @@ fun RegistroScreen(
                 onClick = { onNavigateToLogin() }
             )
         }
+
+
+
+
+
     }
 }
 
