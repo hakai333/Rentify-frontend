@@ -10,6 +10,7 @@ data class PackEntity(
     val categoria: String,
     val nombre: String,
     val descripcion: String,
-    val precio: Double,
-    val destacado: Boolean = false
+    val precio: Int,
+    val destacado: Boolean = false,
+    val foto: Int? = null
 )

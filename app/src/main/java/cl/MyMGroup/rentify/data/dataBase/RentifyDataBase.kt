@@ -1,11 +1,37 @@
-package cl.MyMGroup.rentify.data.dataBase
+    package cl.MyMGroup.rentify.data.dataBase
+    
+    import android.content.Context
+    import androidx.room.Database
+    import androidx.room.Room
+    import androidx.room.RoomDatabase
+    import cl.MyMGroup.rentify.data.dao.CartDao
+    import cl.MyMGroup.rentify.data.dao.PackDao
+    import cl.MyMGroup.rentify.data.entity.CartItemEntity
+    import cl.MyMGroup.rentify.data.entity.PackEntity
+    
+    @Database(entities = [PackEntity::class,
+        CartItemEntity::class],
+        version = 1,
+        exportSchema = false)
+    abstract class RentifyDataBase : RoomDatabase() {
+        abstract fun packDao(): PackDao
+        abstract fun cartDao(): CartDao
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import cl.MyMGroup.rentify.data.dao.PackDao
-import cl.MyMGroup.rentify.data.entity.PackEntity
 
-@Database(entities = [PackEntity::class], version = 1)
-abstract class RentifyDataBase : RoomDatabase() {
-    abstract fun packDao(): PackDao
-}
+        companion object{
+            @Volatile
+            private  var INSTANCE: RentifyDataBase? = null
+
+            fun getDataBase(context: Context): RentifyDataBase{
+                return INSTANCE ?: synchronized(this){
+                    val instance = Room.databaseBuilder(
+                        context.applicationContext,
+                        RentifyDataBase::class.java,
+                        "rentify_database"
+                    ).build()
+                    INSTANCE = instance
+                    instance
+                }
+            }
+        }
+    }

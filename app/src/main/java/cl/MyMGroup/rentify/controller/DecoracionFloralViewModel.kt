@@ -8,6 +8,7 @@ import cl.MyMGroup.rentify.data.entity.PackEntity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import androidx.room.Room
+import cl.MyMGroup.rentify.R
 import kotlinx.coroutines.flow.StateFlow
 
 class DecoracionFloralViewModel(application: Application) : AndroidViewModel(application) {
@@ -24,33 +25,60 @@ class DecoracionFloralViewModel(application: Application) : AndroidViewModel(app
     init {
         viewModelScope.launch {
             val existing = db.packDao().getPacksByCategoria("Decoracion Floral")
-            if(existing.isEmpty()){
+            if (existing.isEmpty()) {
                 val floralPacks = listOf(
+
                     PackEntity(
                         categoria = "Decoracion Floral",
                         nombre = "Esencia Natural",
-                        descripcion = "Una decoracion ideal para eventos pequeños o celebraciones ìntimas.",
-                        precio = 120000.0,
-                        destacado = true
+                        descripcion = """
+                        Ideal para eventos pequeños o celebraciones íntimas. Incluye:
+                        - Centros de mesa florales simples (flores de temporada)
+                        - Arreglo principal para mesa de recepción
+                        - Arreglo para entrada o altar
+                        - Asesoría básica en combinación de colores
+                    """.trimIndent(),
+
+                        precio = 120_000,
+                        destacado = true,
+                        // ✅ CORRECCIÓN 2: Se incluye la URL/referencia de la foto
+                        foto = R.drawable.esencia_natural
                     ),
                     PackEntity(
                         categoria = "Decoracion Floral",
                         nombre = "Elegancia Floral",
-                        descripcion = "Perfecto para matrimonios o eventos formales",
-                        precio = 250000.0,
-                        destacado = false
+                        descripcion = """
+                        Perfecto para matrimonios o eventos formales. Incluye:
+                        - Centros de mesa premium
+                        - Arreglo principal + decoración floral en mesas secundarias
+                        - Camino floral para pasillo o entrada
+                        - Ramo de novia o arreglo especial para anfitrión/a
+                        - Coordinación con la paleta del evento
+                    """.trimIndent(),
+
+                        precio = 250_000,
+                        destacado = false,
+                        // ✅ CORRECCIÓN 2: Se incluye la URL/referencia de la foto
+                        foto = R.drawable.elegancia_floral
                     ),
                     PackEntity(
                         categoria = "Decoracion Floral",
                         nombre = "Luxury Garden",
-                        descripcion = "Ambientancion completamente con flores naturales de alta gama.",
-                        precio = 400000.0,
-                        destacado = false
+                        descripcion = """
+                        Ambientación completa con flores naturales de alta gama. Incluye:
+                        - Decoración floral integral del lugar (entrada, escenario, mesas, bar, etc.)
+                        - Arreglos suspendidos o estructuras florales
+                        - Diseño personalizado con flores exóticas
+                        - Servicio de montaje y desmontaje completo
+                    """.trimIndent(),
+                        precio = 400_000,
+                        destacado = false,
+                        // ✅ CORRECCIÓN 2: Se incluye la URL/referencia de la foto
+                        foto = R.drawable.luxury_garden
                     )
                 )
                 db.packDao().insertAll(floralPacks)
             }
-
             _packs.value = db.packDao().getPacksByCategoria("Decoracion Floral")
         }
     }
