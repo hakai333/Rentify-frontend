@@ -15,9 +15,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import cl.MyMGroup.rentify.controller.RegistroViewModel
 import cl.MyMGroup.rentify.controller.RegistroState
-import cl.MyMGroup.rentify.controller.RegistroViewModelFactory
 import cl.MyMGroup.rentify.data.dataBase.RentifyDataBase
 import cl.MyMGroup.rentify.data.repository.UsuarioRepository
+import kotlinx.coroutines.delay
 
 @Composable
 fun RegistroScreen(
@@ -25,15 +25,9 @@ fun RegistroScreen(
     onNavigateToLogin: () -> Unit
 ) {
 
-    val context = LocalContext.current
-    val database = remember { RentifyDataBase.getInstance(context) }
-    val repository = remember { UsuarioRepository(database.usuarioDao()) }
-
-    val viewModel: RegistroViewModel = viewModel(
-        factory = RegistroViewModelFactory(repository)
-    )
-
-    val registroState by viewModel.registroState.collectAsState();
+    // ✅ Ya no se usa Room, ni Factory, ni Repository
+    val viewModel: RegistroViewModel = viewModel()
+    val registroState by viewModel.registroState.collectAsState()
 
     var nombre by remember { mutableStateOf("") }
     var apellido by remember { mutableStateOf("" ) }
@@ -50,11 +44,15 @@ fun RegistroScreen(
     LaunchedEffect(registroState) {
         when(registroState) {
             is RegistroState.Success -> {
-                kotlinx.coroutines.delay(1500)
+                delay(1500)
+                //PRUEBA
+                println("Registro OK: ${(registroState as RegistroState.Success).message}")
                 viewModel.resetState()
                 onRegistroSuccess()
             }
             is RegistroState.Error -> {
+                //PRUEBA
+                println("Error registro: ${(registroState as RegistroState.Error).message}")
                 localErrorMessage = (registroState as RegistroState.Error).message
             }
             else -> {}
@@ -168,7 +166,7 @@ fun RegistroScreen(
         // Botón de Registro
         Button(
             onClick = {
-                viewModel.registrarUsuario(
+                viewModel.register(
                     nombre,
                     apellido,
                     email,
@@ -194,7 +192,7 @@ fun RegistroScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Texto para volver al login
+        // Texto para navegar al login
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
@@ -211,6 +209,25 @@ fun RegistroScreen(
                 ),
                 onClick = { onNavigateToLogin() }
             )
+        }
+
+        //PRUEBA
+        Button(
+            onClick = {
+                viewModel.register(
+                    nombre = "Miguel",
+                    apellido = "Reyes",
+                    email = "miguelreyesgonzalez@gmail.com",
+                    password = "12345678",
+                    confirmarPassword = "12345678"
+                )
+            },
+            shape = RoundedCornerShape(5.dp),
+            modifier = Modifier
+                .height(55.dp)
+                .fillMaxWidth()
+        ) {
+            Text("Probar Registro Backend")
         }
 
 

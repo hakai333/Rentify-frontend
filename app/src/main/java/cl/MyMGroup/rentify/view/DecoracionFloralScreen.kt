@@ -62,7 +62,7 @@ fun DecoracionFloralScreen(navController: NavController,
 
         content = { padding ->
             if (packs.isEmpty()) {
-                // Muestra un loading o mensaje si la BD aún no está lista
+
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
