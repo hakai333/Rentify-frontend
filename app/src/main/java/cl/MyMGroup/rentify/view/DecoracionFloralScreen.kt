@@ -10,10 +10,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -28,20 +32,34 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import cl.MyMGroup.rentify.controller.CartViewModel
 import cl.MyMGroup.rentify.controller.DecoracionFloralViewModel
 import cl.MyMGroup.rentify.data.entity.PackEntity
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DecoracionFloralScreen(navController: NavController) {
+fun DecoracionFloralScreen(navController: NavController,
+                           cartViewModel: CartViewModel ) {
+
     val viewModel: DecoracionFloralViewModel = viewModel()
     val packs by viewModel.packs.collectAsState()
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Decoración Floral") })
+            TopAppBar(
+                title = { Text("Decoración Floral") },
+                actions = {
+                    IconButton(onClick = { navController.navigate("carrito") }) {
+                        Icon(
+                            imageVector = Icons.Default.ShoppingCart,
+                            contentDescription = "Carrito"
+                        )
+                    }
+                }
+            )
         },
+
         content = { padding ->
             if (packs.isEmpty()) {
                 // Muestra un loading o mensaje si la BD aún no está lista
@@ -61,8 +79,9 @@ fun DecoracionFloralScreen(navController: NavController) {
                         .padding(16.dp)
                 ) {
                     items(packs) { pack ->
-                        PackCard(pack = pack, onAddToCart = {
-                            // TODO: aquí se conectará con el carrito
+                        PackCard(pack = pack,
+                            onAddToCart = {
+                            cartViewModel.addToCart(pack)
                         })
                     }
                 }

@@ -40,9 +40,7 @@ class DecoracionFloralViewModel(application: Application) : AndroidViewModel(app
                     """.trimIndent(),
 
                         precio = 120_000,
-                        destacado = true,
-                        // ✅ CORRECCIÓN 2: Se incluye la URL/referencia de la foto
-                        foto = R.drawable.esencia_natural
+                        destacado = true
                     ),
                     PackEntity(
                         categoria = "Decoracion Floral",
@@ -57,9 +55,7 @@ class DecoracionFloralViewModel(application: Application) : AndroidViewModel(app
                     """.trimIndent(),
 
                         precio = 250_000,
-                        destacado = false,
-                        // ✅ CORRECCIÓN 2: Se incluye la URL/referencia de la foto
-                        foto = R.drawable.elegancia_floral
+                        destacado = false
                     ),
                     PackEntity(
                         categoria = "Decoracion Floral",
@@ -72,9 +68,7 @@ class DecoracionFloralViewModel(application: Application) : AndroidViewModel(app
                         - Servicio de montaje y desmontaje completo
                     """.trimIndent(),
                         precio = 400_000,
-                        destacado = false,
-                        // ✅ CORRECCIÓN 2: Se incluye la URL/referencia de la foto
-                        foto = R.drawable.luxury_garden
+                        destacado = false
                     )
                 )
                 db.packDao().insertAll(floralPacks)

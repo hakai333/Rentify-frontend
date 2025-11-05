@@ -11,11 +11,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val dataBase = RentifyDataBase.getDataBase(this)
-
         setContent {
             RentifyTheme {
-                AppNavigation(dataBase = dataBase)
+                AppNavigation()
             }
         }
     }

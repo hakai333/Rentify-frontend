@@ -26,7 +26,7 @@ fun RegistroScreen(
 ) {
 
     val context = LocalContext.current
-    val database = remember { RentifyDataBase.genInstance(context) }
+    val database = remember { RentifyDataBase.getInstance(context) }
     val repository = remember { UsuarioRepository(database.usuarioDao()) }
 
     val viewModel: RegistroViewModel = viewModel(

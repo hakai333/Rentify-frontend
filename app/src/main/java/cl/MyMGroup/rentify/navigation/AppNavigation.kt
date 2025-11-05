@@ -1,6 +1,8 @@
 package cl.MyMGroup.rentify.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import cl.MyMGroup.rentify.view.CarritoScreen
@@ -15,11 +17,22 @@ import cl.MyMGroup.rentify.view.CarpasScreen
 import cl.MyMGroup.rentify.view.MobiliarioScreen
 import cl.MyMGroup.rentify.view.ParcelasScreen
 import cl.MyMGroup.rentify.controller.CartViewModel
+import cl.MyMGroup.rentify.controller.CartViewModelFactory
+import cl.MyMGroup.rentify.data.dataBase.RentifyDataBase
 
 
 @Composable
 fun AppNavigation() {
-    val navController = rememberNavController()
+    val navController = rememberNavController();
+    val context = LocalContext.current;
+
+    val db = RentifyDataBase.getInstance(context);
+    val cartDao = db.cartDao();
+
+
+    val cartViewModel: CartViewModel = viewModel(
+        factory = CartViewModelFactory(cartDao)
+    )
 
     NavHost(
         navController = navController,
@@ -50,13 +63,14 @@ fun AppNavigation() {
             )
         }
         composable("home") { HomeScreen(navController) }
+
         composable("carrito") {
             CarritoScreen(
                 cartViewModel = cartViewModel,
                 onBack = { navController.popBackStack() }
             )
         }
-        composable("decoracionFloral") { DecoracionFloralScreen(navController) }
+        composable("decoracionFloral") { DecoracionFloralScreen(navController, cartViewModel) }
         composable("carpas") { CarpasScreen(navController) }
         composable("parcelas") { ParcelasScreen(navController) }
         composable("banqueteria") { BanqueteriaScreen(navController) }
