@@ -19,6 +19,10 @@ import cl.MyMGroup.rentify.data.dataBase.RentifyDataBase
 import cl.MyMGroup.rentify.data.repository.UsuarioRepository
 import kotlinx.coroutines.delay
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.graphics.Color
+
+
 @Composable
 fun RegistroScreen(
     onRegistroSuccess: () -> Unit,
@@ -34,7 +38,10 @@ fun RegistroScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmarPassword by remember { mutableStateOf("") }
+
     var localErrorMessage by remember { mutableStateOf("") }
+    var localMessageColor by remember { mutableStateOf(Color.Black) }
+
 
 
 
@@ -42,22 +49,28 @@ fun RegistroScreen(
 
     // Manejar el estado del registro
     LaunchedEffect(registroState) {
-        when(registroState) {
+        when (registroState) {
             is RegistroState.Success -> {
+                // Asigna primero mensaje y color
+                localErrorMessage = (registroState as RegistroState.Success).message
+                localMessageColor = Color(0xFF4CAF50) // Verde éxito
+
+                // Opcional: esperar 1.5s antes de limpiar
                 delay(1500)
-                //PRUEBA
-                println("Registro OK: ${(registroState as RegistroState.Success).message}")
+
                 viewModel.resetState()
                 onRegistroSuccess()
             }
             is RegistroState.Error -> {
-                //PRUEBA
-                println("Error registro: ${(registroState as RegistroState.Error).message}")
                 localErrorMessage = (registroState as RegistroState.Error).message
+                localMessageColor = Color.Red
             }
-            else -> {}
+            else -> {
+                localErrorMessage = ""
+            }
         }
     }
+
 
 
 
@@ -105,7 +118,7 @@ fun RegistroScreen(
             enabled = !isLoading
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+
 
         // Campo Email
         OutlinedTextField(
@@ -119,8 +132,6 @@ fun RegistroScreen(
             modifier = Modifier.fillMaxWidth(),
             enabled = !isLoading
         )
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         // Campo Contraseña
         OutlinedTextField(
@@ -136,7 +147,6 @@ fun RegistroScreen(
             enabled = !isLoading
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
 
         // Campo Confirmar Contraseña
         OutlinedTextField(
@@ -156,7 +166,7 @@ fun RegistroScreen(
         if (localErrorMessage.isNotEmpty()) {
             Text(
                 text = localErrorMessage,
-                color = MaterialTheme.colorScheme.error,
+                color = localMessageColor,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
         }
@@ -211,24 +221,6 @@ fun RegistroScreen(
             )
         }
 
-        //PRUEBA
-        Button(
-            onClick = {
-                viewModel.register(
-                    nombre = "Miguel",
-                    apellido = "Reyes",
-                    email = "miguelreyesgonzalez@gmail.com",
-                    password = "12345678",
-                    confirmarPassword = "12345678"
-                )
-            },
-            shape = RoundedCornerShape(5.dp),
-            modifier = Modifier
-                .height(55.dp)
-                .fillMaxWidth()
-        ) {
-            Text("Probar Registro Backend")
-        }
 
 
 

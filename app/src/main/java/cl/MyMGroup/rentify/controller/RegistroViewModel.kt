@@ -64,14 +64,19 @@ class RegistroViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 _registroState.value = RegistroState.Loading
-                val request = RegisterRequest(nombre, email, password)
-                val response = api.register(request)
+                val response = api.register(RegisterRequest(nombre, email, password))
+
                 if (response.isSuccessful) {
-                    val message = response.body()?.message ?: "Registrado correctamente"
-                    _registroState.value = RegistroState.Success(message)
+                    val body = response.body()
+                    if (body != null && body.message.contains("registrado", ignoreCase = true)) {
+                        _registroState.value = RegistroState.Error(body.message)
+                    } else {
+                        _registroState.value = RegistroState.Success(body?.message ?: "Registrado correctamente")
+                    }
                 } else {
                     _registroState.value = RegistroState.Error("Error en servidor: ${response.code()}")
                 }
+
             } catch (ex: Exception) {
                 _registroState.value = RegistroState.Error("Error al registrarse: ${ex.message}")
             }

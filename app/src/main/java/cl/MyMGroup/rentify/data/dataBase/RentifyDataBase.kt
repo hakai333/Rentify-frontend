@@ -13,7 +13,7 @@ import cl.MyMGroup.rentify.data.entity.UsuarioEntity
 
 @Database(
     entities = [PackEntity::class, UsuarioEntity::class, CartItemEntity::class],
-    version = 6,
+    version = 8,
     exportSchema = false
 )
 abstract class RentifyDataBase : RoomDatabase() {

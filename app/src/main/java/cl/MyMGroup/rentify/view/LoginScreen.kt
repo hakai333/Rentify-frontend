@@ -3,6 +3,7 @@ package cl.MyMGroup.rentify.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -41,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import cl.MyMGroup.rentify.controller.LoginState
 import cl.MyMGroup.rentify.controller.LoginViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun LoginScreen(
@@ -51,26 +53,32 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
     var localErrorMessage by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
 
-    val loginState by viewModel.loginState.collectAsState();
+    val loginState by viewModel.loginState.collectAsState()
+
+    val isLoading = loginState is LoginState.Loading
+    val errorMessage = when (loginState) {
+        is LoginState.Error -> (loginState as LoginState.Error).message
+        else -> ""
+    }
 
 
     //Maneja estado del login
     LaunchedEffect(loginState) {
-        when( loginState ) {
+        when (loginState) {
             is LoginState.Success -> {
                 onLoginSuccess()
                 viewModel.resetState()
             }
             is LoginState.Error -> {
-                localErrorMessage = ( loginState as LoginState.Error).message
+                localErrorMessage = (loginState as LoginState.Error).message
             }
             else -> { }
         }
     }
 
-    val isLoading = loginState is LoginState.Loading
+
+
 
     Column(
         // Propiedades
@@ -125,32 +133,43 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        if ( localErrorMessage.isNotEmpty() ) {
+        if (errorMessage.isNotEmpty()) {
             Text(
-                text = localErrorMessage,
+                text = errorMessage,
                 color = MaterialTheme.colorScheme.error,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
         }
 
+
         Button(
             onClick = { viewModel.login(email, pass) },
             shape = RoundedCornerShape(5.dp),
-            modifier = Modifier.height(55.dp)
-                .height(50.dp)
+            modifier = Modifier
+                .height(55.dp)
                 .fillMaxWidth(),
             enabled = !isLoading
         ) {
-            if ( isLoading ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    strokeWidth = 2.dp
-                )
-            } else {
-                Text("Ingresar")
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(
+                        text = "Ingresar",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
             }
-
         }
+
+
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -175,6 +194,8 @@ fun LoginScreen(
             )
 
         }
+
+
 
 
 

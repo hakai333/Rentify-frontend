@@ -25,11 +25,19 @@ class LoginViewModel : ViewModel() {
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
 
     fun login(email: String, password: String) {
-        if (email.isEmpty() || password.isEmpty()) {
-            _loginState.value = LoginState.Error("Por favor completa todos los campos")
+        // validacion campos vacius
+        if (email.isEmpty() && password.isEmpty()) {
+            _loginState.value = LoginState.Error("Correo y contraseña están vacíos")
+            return
+        } else if (email.isEmpty()) {
+            _loginState.value = LoginState.Error("Correo vacío")
+            return
+        } else if (password.isEmpty()) {
+            _loginState.value = LoginState.Error("Contraseña vacía")
             return
         }
 
+        // ejecuta la llamada a la API
         viewModelScope.launch {
             try {
                 _loginState.value = LoginState.Loading
@@ -43,15 +51,19 @@ class LoginViewModel : ViewModel() {
                         _loginState.value = LoginState.Error("Respuesta vacía del servidor")
                     }
                 } else {
-                    _loginState.value = LoginState.Error("Error ${response.code()}: ${response.message()}")
+                    if (response.code() == 401) {
+                        _loginState.value = LoginState.Error("Correo o contraseña inválida")
+                    } else {
+                        _loginState.value = LoginState.Error("Error ${response.code()}: ${response.message()}")
+                    }
                 }
 
             } catch (ex: Exception) {
                 _loginState.value = LoginState.Error("Error de conexión: ${ex.message}")
             }
         }
-
     }
+
 
     fun resetState() {
         _loginState.value = LoginState.Idle

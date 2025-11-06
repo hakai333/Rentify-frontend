@@ -13,11 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 class DecoracionFloralViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val db = Room.databaseBuilder(
-        application,
-        RentifyDataBase::class.java,
-        "rentify_db"
-    ).build()
+    private val db = RentifyDataBase.getInstance(application)
 
     private val _packs = MutableStateFlow<List<PackEntity>>(emptyList())
     val packs: StateFlow<List<PackEntity>> = _packs

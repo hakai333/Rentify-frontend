@@ -1,5 +1,6 @@
 package cl.MyMGroup.rentify.navigation
 
+import CotizacionScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -19,6 +20,7 @@ import cl.MyMGroup.rentify.view.ParcelasScreen
 import cl.MyMGroup.rentify.controller.CartViewModel
 import cl.MyMGroup.rentify.controller.CartViewModelFactory
 import cl.MyMGroup.rentify.data.dataBase.RentifyDataBase
+
 
 
 @Composable
@@ -67,15 +69,27 @@ fun AppNavigation() {
         composable("carrito") {
             CarritoScreen(
                 cartViewModel = cartViewModel,
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onRealizarCotizacion = {
+                    // Aquí pones lo que debe pasar al cotizar
+                    // Por ejemplo, navegar a otra pantalla
+                    navController.navigate("cotizacionScreen")
+                }
             )
+
         }
+
+
+        composable("cotizacionScreen") { CotizacionScreen(navController, cartViewModel = cartViewModel, onBack = { navController.popBackStack() }) }
+
+
         composable("decoracionFloral") { DecoracionFloralScreen(navController, cartViewModel) }
         composable("carpas") { CarpasScreen(navController) }
         composable("parcelas") { ParcelasScreen(navController) }
         composable("banqueteria") { BanqueteriaScreen(navController) }
-        composable("mobiliario") { MobiliarioScreen(navController) }
+        composable("mobiliario") { MobiliarioScreen(navController, cartViewModel) }
         composable("amplificacion") { AmplificacionYPantallas(navController) }
+
 
     }
 

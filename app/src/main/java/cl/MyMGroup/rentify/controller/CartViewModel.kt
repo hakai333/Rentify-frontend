@@ -26,7 +26,7 @@ class CartViewModel(private  val cartDao: CartDao) : ViewModel(){
                     nombre = pack.nombre,
                     precio = pack.precio,
                     cantidad = 1,
-                    //foto = pack.foto
+                    categoria = pack.categoria ?: "N/A"
                 )
                 cartDao.insertItem(newItem)
             }

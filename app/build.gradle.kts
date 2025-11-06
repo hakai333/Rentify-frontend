@@ -52,6 +52,8 @@ android {
         implementation(libs.androidx.material3)
         implementation(libs.androidx.navigation.compose)
         implementation(libs.androidx.navigation.runtime.ktx)
+        implementation(libs.androidx.runtime)
+        implementation(libs.material3)
 
         // ROOM
         val room_version = "2.6.1"
@@ -62,6 +64,7 @@ android {
         implementation("com.squareup.retrofit2:retrofit:2.9.0")
         implementation("com.squareup.retrofit2:converter-gson:2.9.0")
         implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+        implementation("androidx.compose.material:material-icons-extended:1.5.0")
 
     }
 

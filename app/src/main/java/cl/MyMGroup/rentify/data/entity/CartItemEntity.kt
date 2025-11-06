@@ -11,5 +11,5 @@ data class CartItemEntity(
     val nombre: String,
     val precio: Int,
     val cantidad: Int = 1,
-    val foto: String? = null
+    val categoria: String
 )

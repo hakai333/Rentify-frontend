@@ -79,7 +79,7 @@ fun DecoracionFloralScreen(navController: NavController,
                         .padding(16.dp)
                 ) {
                     items(packs) { pack ->
-                        PackCard(pack = pack,
+                        PackCardDecoracionFloral(pack = pack,
                             onAddToCart = {
                             cartViewModel.addToCart(pack)
                         })
@@ -91,7 +91,7 @@ fun DecoracionFloralScreen(navController: NavController,
 }
 
 @Composable
-fun PackCard(pack: PackEntity, onAddToCart: () -> Unit) {
+fun PackCardDecoracionFloral(pack: PackEntity, onAddToCart: () -> Unit) {
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
