@@ -35,23 +35,41 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.navigation.NavController
+import cl.MyMGroup.rentify.controller.LoginState
+import cl.MyMGroup.rentify.controller.LoginViewModel
+import cl.MyMGroup.rentify.controller.PedidoViewModel
+import cl.MyMGroup.rentify.utils.parseDetalleJson
+import cl.MyMGroup.rentify.view.formatPrecioCLP
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CotizacionScreen(
     navController: NavController,
-    cartViewModel: CartViewModel,
+    pedidoViewModel: PedidoViewModel,
+    loginViewModel: LoginViewModel,
     onBack: () -> Unit
 ) {
-    val items by cartViewModel.cartItems.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope() // Para lanzar coroutines
+    val pedidos by pedidoViewModel.pedidos.collectAsState()
+    val loginState by loginViewModel.loginState.collectAsState()
+
+
+    LaunchedEffect(Unit) {
+        val usuarioId = when (loginState) {
+            is LoginState.Success -> (loginState as LoginState.Success).usuario.id
+            else -> null
+        }
+        if (usuarioId != null) {
+            pedidoViewModel.cargarPedidos(usuarioId) // ahora es seguro, Long no nullable
+        }
+    }
+
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Detalle de Cotización") },
+                title = { Text("Mis Pedidos") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Volver")
@@ -59,7 +77,6 @@ fun CotizacionScreen(
                 }
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
         content = { padding ->
             Column(
                 modifier = Modifier
@@ -67,19 +84,19 @@ fun CotizacionScreen(
                     .padding(padding)
                     .padding(16.dp)
             ) {
-                if (items.isEmpty()) {
+                if (pedidos.isEmpty()) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            "No hay elementos en el carrito",
+                            "No tienes pedidos confirmados",
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
                 } else {
                     LazyColumn(modifier = Modifier.weight(1f)) {
-                        items(items) { item ->
+                        items(pedidos) { pedido ->
                             Card(
                                 shape = RoundedCornerShape(8.dp),
                                 modifier = Modifier
@@ -87,57 +104,25 @@ fun CotizacionScreen(
                                     .padding(vertical = 4.dp)
                             ) {
                                 Column(modifier = Modifier.padding(8.dp)) {
-                                    Text(item.nombre, style = MaterialTheme.typography.titleMedium)
-                                    Text(
-                                        "Categoría: ${item.categoria ?: "N/A"}",
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-                                    Text("Cantidad: ${item.cantidad}", style = MaterialTheme.typography.bodySmall)
-                                    Text("Precio unitario: ${formatPrecioCLP(item.precio)}", style = MaterialTheme.typography.bodySmall)
-                                    Text(
-                                        "Subtotal: ${formatPrecioCLP(item.precio * item.cantidad)}",
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
+                                    Text("Pedido #${pedido.pedidoId}", style = MaterialTheme.typography.titleMedium)
+                                    Text("Dirección: ${pedido.direccion}", style = MaterialTheme.typography.bodyMedium)
+                                    Text("Total: ${formatPrecioCLP(pedido.total.toInt())}", style = MaterialTheme.typography.bodyMedium)
+                                    Text("Detalle:", style = MaterialTheme.typography.bodyMedium)
+
+                                    val detalleParseado = parseDetalleJson(pedido.detalle)
+
+                                    detalleParseado.forEach { pack ->
+                                        Text(
+                                            "- PackId: ${pack.packId}, Cantidad: ${pack.cantidad}",
+                                            style = MaterialTheme.typography.bodySmall
+                                        )
+                                    }
                                 }
                             }
                         }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Text(
-                        "Total: ${formatPrecioCLP(cartViewModel.getTotal())}",
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.align(Alignment.End)
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Botón confirmar cotización
-                    Button(
-                        onClick = {
-                            scope.launch {
-                                // Mostrar Snackbar
-                                snackbarHostState.showSnackbar("¡Cotización realizada con éxito!")
-                                // Limpiar carrito después de mostrar el mensaje
-                                cartViewModel.clearCart()
-
-
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                    ) {
-                        Text("Confirmar Cotización")
                     }
                 }
             }
         }
     )
-}
-
-// Formateo de precio a CLP
-fun formatPrecioCLP(valor: Int): String {
-    return "$" + "%,d".format(valor).replace(',', '.')
 }

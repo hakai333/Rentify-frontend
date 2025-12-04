@@ -68,10 +68,10 @@ class RegistroViewModel : ViewModel() {
 
                 if (response.isSuccessful) {
                     val body = response.body()
-                    if (body != null && body.message.contains("registrado", ignoreCase = true)) {
-                        _registroState.value = RegistroState.Error(body.message)
+                    if (body != null && body.mensaje.contains("registrado", ignoreCase = true)) {
+                        _registroState.value = RegistroState.Error(body.mensaje)
                     } else {
-                        _registroState.value = RegistroState.Success(body?.message ?: "Registrado correctamente")
+                        _registroState.value = RegistroState.Success(body?.mensaje ?: "Registrado correctamente")
                     }
                 } else {
                     _registroState.value = RegistroState.Error("Error en servidor: ${response.code()}")

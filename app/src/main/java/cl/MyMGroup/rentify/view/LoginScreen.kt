@@ -46,15 +46,15 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun LoginScreen(
+    loginViewModel: LoginViewModel,
     onLoginSuccess: () -> Unit,
-    onNavigateToRegister: () -> Unit,
-    viewModel: LoginViewModel = viewModel()
+    onNavigateToRegister: () -> Unit
 ){
     var email by remember { mutableStateOf("") }
     var pass by remember { mutableStateOf("") }
     var localErrorMessage by remember { mutableStateOf("") }
 
-    val loginState by viewModel.loginState.collectAsState()
+    val loginState by loginViewModel.loginState.collectAsState()
 
     val isLoading = loginState is LoginState.Loading
     val errorMessage = when (loginState) {
@@ -68,7 +68,6 @@ fun LoginScreen(
         when (loginState) {
             is LoginState.Success -> {
                 onLoginSuccess()
-                viewModel.resetState()
             }
             is LoginState.Error -> {
                 localErrorMessage = (loginState as LoginState.Error).message
@@ -143,7 +142,7 @@ fun LoginScreen(
 
 
         Button(
-            onClick = { viewModel.login(email, pass) },
+            onClick = { loginViewModel.login(email, pass) },
             shape = RoundedCornerShape(5.dp),
             modifier = Modifier
                 .height(55.dp)

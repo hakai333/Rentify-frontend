@@ -1,78 +1,53 @@
 package cl.MyMGroup.rentify.controller
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room.Room
-import cl.MyMGroup.rentify.data.dao.UsuarioDao
-import cl.MyMGroup.rentify.data.dataBase.RentifyDataBase
+import cl.MyMGroup.rentify.data.api.ApiService
 import cl.MyMGroup.rentify.data.entity.LoginRequest
+import cl.MyMGroup.rentify.data.entity.Usuario
 import cl.MyMGroup.rentify.data.entity.UsuarioEntity
-import cl.MyMGroup.rentify.data.network.RetrofitProvider
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
-class LoginViewModel : ViewModel() {
+// Estados de login
+sealed class LoginState {
+    object Idle : LoginState()
+    object Loading : LoginState()
+    data class Success(val usuario: Usuario) : LoginState()
+    data class Error(val message: String) : LoginState()
+}
 
-    private val api = RetrofitProvider.authService
+class LoginViewModel(
+    private val apiService: ApiService
+) : ViewModel() {
 
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
-    val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
+    val loginState: StateFlow<LoginState> get() = _loginState
 
     fun login(email: String, password: String) {
-        // validacion campos vacius
-        if (email.isEmpty() && password.isEmpty()) {
-            _loginState.value = LoginState.Error("Correo y contraseña están vacíos")
-            return
-        } else if (email.isEmpty()) {
-            _loginState.value = LoginState.Error("Correo vacío")
-            return
-        } else if (password.isEmpty()) {
-            _loginState.value = LoginState.Error("Contraseña vacía")
-            return
-        }
-
-        // ejecuta la llamada a la API
         viewModelScope.launch {
+            _loginState.value = LoginState.Loading
             try {
-                _loginState.value = LoginState.Loading
-                val response = api.login(LoginRequest(email, password))
-
+                val response = apiService.login(LoginRequest(email, password))
                 if (response.isSuccessful) {
-                    val usuario = response.body()
+                    val authResponse = response.body()!!
+                    val usuario = authResponse.usuario
                     if (usuario != null) {
                         _loginState.value = LoginState.Success(usuario)
                     } else {
-                        _loginState.value = LoginState.Error("Respuesta vacía del servidor")
+                        _loginState.value = LoginState.Error(authResponse.mensaje)
                     }
                 } else {
-                    if (response.code() == 401) {
-                        _loginState.value = LoginState.Error("Correo o contraseña inválida")
-                    } else {
-                        _loginState.value = LoginState.Error("Error ${response.code()}: ${response.message()}")
-                    }
+                    _loginState.value = LoginState.Error("Email o contraseña incorrectos")
                 }
-
-            } catch (ex: Exception) {
-                _loginState.value = LoginState.Error("Error de conexión: ${ex.message}")
+            } catch (e: Exception) {
+                _loginState.value = LoginState.Error("Error de conexión: ${e.message}")
             }
         }
     }
 
-
     fun resetState() {
         _loginState.value = LoginState.Idle
     }
-}
-
-sealed class LoginState {
-    object Idle : LoginState()
-    object Loading : LoginState()
-    data class Success(val usuario: UsuarioEntity) : LoginState()
-    data class Error(val message: String) : LoginState()
 }

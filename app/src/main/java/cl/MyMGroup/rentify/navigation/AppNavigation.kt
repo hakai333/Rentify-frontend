@@ -19,21 +19,35 @@ import cl.MyMGroup.rentify.view.MobiliarioScreen
 import cl.MyMGroup.rentify.view.ParcelasScreen
 import cl.MyMGroup.rentify.controller.CartViewModel
 import cl.MyMGroup.rentify.controller.CartViewModelFactory
+import cl.MyMGroup.rentify.controller.LoginViewModel
+import cl.MyMGroup.rentify.controller.LoginViewModelFactory
+import cl.MyMGroup.rentify.controller.PedidoViewModel
+import cl.MyMGroup.rentify.controller.PedidoViewModelFactory
+import cl.MyMGroup.rentify.data.api.ApiService
 import cl.MyMGroup.rentify.data.dataBase.RentifyDataBase
-
+import cl.MyMGroup.rentify.data.network.RetrofitProvider
+import cl.MyMGroup.rentify.data.repository.PedidoRepository
 
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController();
     val context = LocalContext.current;
+    val apiService: ApiService = RetrofitProvider.apiService;
 
     val db = RentifyDataBase.getInstance(context);
     val cartDao = db.cartDao();
+    val pedidoRepository = PedidoRepository(apiService);
 
+    val loginViewModel: LoginViewModel = viewModel(
+        factory = LoginViewModelFactory(apiService)
+    )
+    val pedidoViewModel: PedidoViewModel = viewModel(
+        factory = PedidoViewModelFactory(pedidoRepository)
+    )
 
     val cartViewModel: CartViewModel = viewModel(
-        factory = CartViewModelFactory(cartDao)
+        factory = CartViewModelFactory(cartDao, pedidoRepository)
     )
 
     NavHost(
@@ -42,9 +56,10 @@ fun AppNavigation() {
     ) {
         composable("login") {
             LoginScreen(
+                loginViewModel = loginViewModel, // ✅ AQUÍ ESTÁ LA CLAVE
                 onLoginSuccess = {
                     navController.navigate("home") {
-                        popUpTo("login") { inclusive = true; }
+                        popUpTo("login") { inclusive = true }
                     }
                 },
                 onNavigateToRegister = {
@@ -52,6 +67,7 @@ fun AppNavigation() {
                 }
             )
         }
+
         composable("registro") {
             RegistroScreen(
                 onRegistroSuccess = {
@@ -69,19 +85,22 @@ fun AppNavigation() {
         composable("carrito") {
             CarritoScreen(
                 cartViewModel = cartViewModel,
-                onBack = { navController.popBackStack() },
-                onRealizarCotizacion = {
-                    // Aquí pones lo que debe pasar al cotizar
-                    // Por ejemplo, navegar a otra pantalla
-                    navController.navigate("cotizacionScreen")
-                }
+                loginViewModel = loginViewModel,
+                navController = navController, // ahora sí
+                onBack = { navController.popBackStack() }
             )
 
         }
 
 
-        composable("cotizacionScreen") { CotizacionScreen(navController, cartViewModel = cartViewModel, onBack = { navController.popBackStack() }) }
-
+        composable("cotizacionScreen") {
+            CotizacionScreen(
+                navController = navController,
+                pedidoViewModel = pedidoViewModel,
+                loginViewModel = loginViewModel,
+                onBack = { navController.popBackStack() }
+            )
+        }
 
         composable("decoracionFloral") { DecoracionFloralScreen(navController, cartViewModel) }
         composable("carpas") { CarpasScreen(navController) }

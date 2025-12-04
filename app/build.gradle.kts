@@ -54,6 +54,7 @@ android {
         implementation(libs.androidx.navigation.runtime.ktx)
         implementation(libs.androidx.runtime)
         implementation(libs.material3)
+        implementation(libs.navigation.runtime.ktx)
 
         // ROOM
         val room_version = "2.6.1"
