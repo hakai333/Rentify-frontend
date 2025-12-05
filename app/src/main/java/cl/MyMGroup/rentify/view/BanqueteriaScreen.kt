@@ -1,55 +1,58 @@
 package cl.MyMGroup.rentify.view
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import cl.MyMGroup.rentify.controller.BanqueteriaViewModel
+import cl.MyMGroup.rentify.controller.CartViewModel
+import cl.MyMGroup.rentify.data.entity.PackEntity
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BanqueteriaScreen(navController: NavController) {
-    Scaffold(
-        content = { padding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
+fun BanqueteriaScreen(
+    navController: NavController,
+    cartViewModel: CartViewModel
+) {
+    val viewModel: BanqueteriaViewModel = viewModel()
+    val packs by viewModel.packs.collectAsState()
 
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Text(
-                        text = "En proceso...",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Estamos preparando esta sección para ti",
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Banquetería y Producción") },
+                actions = {
+                    IconButton(onClick = { navController.navigate("carrito") }) {
+                        Icon(Icons.Default.ShoppingCart, contentDescription = "Carrito")
+                    }
+                }
+            )
+        },
+        content = { padding ->
+            if (packs.isEmpty()) {
+                Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                LazyColumn(
+                    Modifier.fillMaxSize().padding(padding).padding(16.dp)
+                ) {
+                    items(packs) { pack ->
+                        PackCard(pack, cartViewModel)
+                    }
                 }
             }
         }
     )
 }
+

@@ -22,7 +22,7 @@ interface ApiService {
     suspend fun register(@Body request: RegisterRequest): Response<AuthResponse>
 
     @Headers("Content-Type: application/json")
-    @POST("http://10.0.2.2:8080/api/auth/login")
+    @POST("api/auth/login")
     suspend fun login(@Body body: LoginRequest): Response<AuthResponse>
 
     @POST("http://10.0.2.2:8080/api/pedidos")

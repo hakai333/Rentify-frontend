@@ -20,7 +20,7 @@ sealed class RegistroState {
 
 class RegistroViewModel : ViewModel() {
 
-    private val api = RetrofitProvider.authService
+    private val api = RetrofitProvider.apiService
 
     private val _registroState = MutableStateFlow<RegistroState>(RegistroState.Idle)
     val registroState: StateFlow<RegistroState> = _registroState.asStateFlow()

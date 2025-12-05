@@ -38,7 +38,7 @@ class MobiliarioViewModel(application: Application) : AndroidViewModel(applicati
                     """.trimIndent(),
 
                         precio = 39_990,
-                        destacado = false
+                        destacado = true
                     ),
                     PackEntity(
                         categoria = "Arriendo Mobililario",

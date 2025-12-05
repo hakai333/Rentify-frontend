@@ -36,7 +36,7 @@ class DecoracionFloralViewModel(application: Application) : AndroidViewModel(app
                     """.trimIndent(),
 
                         precio = 120_000,
-                        destacado = true
+                        destacado = false
                     ),
                     PackEntity(
                         categoria = "Decoracion Floral",
@@ -64,7 +64,7 @@ class DecoracionFloralViewModel(application: Application) : AndroidViewModel(app
                         - Servicio de montaje y desmontaje completo
                     """.trimIndent(),
                         precio = 400_000,
-                        destacado = false
+                        destacado = true
                     )
                 )
                 db.packDao().insertAll(floralPacks)

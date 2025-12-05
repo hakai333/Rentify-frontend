@@ -1,6 +1,6 @@
 package cl.MyMGroup.rentify.data.network
 
-
+import android.os.Build
 import cl.MyMGroup.rentify.data.api.ApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -20,17 +20,25 @@ object RetrofitProvider {
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl("http://10.0.2.2:8080/")
+    // Cambia la base URL según si estás en emulador o en dispositivo físico
+    private val BASE_URL: String
+        get() {
+            // 10.0.2.2 funciona solo en emulador
+            return if (Build.MODEL.contains("Emulator") || Build.MODEL.contains("Android SDK built for")) {
+                "http://10.0.2.2:8080/"
+            } else {
+                "http://192.168.1.86:8080/" // IP de tu PC en la red Wi-Fi
+            }
+        }
+
+    private val retrofit: Retrofit = Retrofit.Builder()
+        .baseUrl(BASE_URL)
         .client(client)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    fun <T> create(service: Class<T>): T = retrofit.create(service)
-
-    val authService: ApiService by lazy {
-        create(ApiService::class.java)
+    // Solo necesitas un service, puedes llamarlo apiService
+    val apiService: ApiService by lazy {
+        retrofit.create(ApiService::class.java)
     }
-
-    val apiService: ApiService = retrofit.create(ApiService::class.java)
 }

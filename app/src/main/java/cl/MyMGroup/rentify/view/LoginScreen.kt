@@ -19,6 +19,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Label
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -110,25 +111,30 @@ fun LoginScreen(
         //Contenedores
         OutlinedTextField(
             value = email,
-            onValueChange = {
-                email = it
-                if (localErrorMessage.isNotEmpty()) localErrorMessage = "" },
-            label = { Text ("Correo electronico") },
+            onValueChange = { email = it },
+            label = { Text("Correo electrónico") },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            // Sin usar outlinedTextFieldColors ni textFieldColors
+            textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
+            placeholder = { Text("Ingresa tu correo") },
+            // Cursor y bordes por defecto funcionan bien
         )
+
 
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = pass,
-            onValueChange = { pass = it
-                if (localErrorMessage.isNotEmpty()) localErrorMessage = "" },
-            label = { Text ("Contraseña") },
+            onValueChange = { pass = it },
+            label = { Text("Contraseña") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
-            visualTransformation = PasswordVisualTransformation()
+            visualTransformation = PasswordVisualTransformation(),
+            textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
+            placeholder = { Text("Ingresa tu contraseña") }
         )
+
 
         Spacer(modifier = Modifier.height(20.dp))
 

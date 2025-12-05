@@ -3,9 +3,11 @@ package cl.MyMGroup.rentify.controller
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cl.MyMGroup.rentify.data.api.ApiService
+import cl.MyMGroup.rentify.data.entity.AuthResponse
 import cl.MyMGroup.rentify.data.entity.LoginRequest
 import cl.MyMGroup.rentify.data.entity.Usuario
 import cl.MyMGroup.rentify.data.entity.UsuarioEntity
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -30,22 +32,32 @@ class LoginViewModel(
             _loginState.value = LoginState.Loading
             try {
                 val response = apiService.login(LoginRequest(email, password))
-                if (response.isSuccessful) {
-                    val authResponse = response.body()!!
-                    val usuario = authResponse.usuario
-                    if (usuario != null) {
-                        _loginState.value = LoginState.Success(usuario)
-                    } else {
-                        _loginState.value = LoginState.Error(authResponse.mensaje)
-                    }
+
+                val authResponse: AuthResponse? = (if (response.isSuccessful) {
+                    response.body()
                 } else {
-                    _loginState.value = LoginState.Error("Email o contraseña incorrectos")
+                    // Parsear errorBody y castear a AuthResponse
+                    val errorJson = response.errorBody()?.string()
+                    if (errorJson != null) {
+                        Gson().fromJson(errorJson, AuthResponse::class.java)
+                    } else {
+                        null
+                    }
+                }) as AuthResponse?
+
+                if (authResponse?.usuario != null) {
+                    _loginState.value = LoginState.Success(authResponse.usuario)
+                } else {
+                    _loginState.value = LoginState.Error(authResponse?.mensaje ?: "Email o contraseña incorrectos")
                 }
+
             } catch (e: Exception) {
                 _loginState.value = LoginState.Error("Error de conexión: ${e.message}")
             }
         }
     }
+
+
 
     fun resetState() {
         _loginState.value = LoginState.Idle

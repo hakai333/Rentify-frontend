@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 
 class AuthViewModel : ViewModel() {
 
-    private val api = RetrofitProvider.authService
+    private val api = RetrofitProvider.apiService
 
     fun register(nombre: String, email: String, password: String) {
         viewModelScope.launch {
