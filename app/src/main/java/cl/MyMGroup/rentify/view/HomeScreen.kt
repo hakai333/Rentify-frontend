@@ -30,57 +30,11 @@ data class HomeOption(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    navController: NavController,
-    qrValue: String? = null
+    navController: NavController
 ) {
     var mostrarScanner by remember { mutableStateOf(false) }
-    var qrToNavigate by remember { mutableStateOf<String?>(null) }
 
-    // 🔹 Si ya tenemos qrValue desde parámetros, simulamos la lectura
-    LaunchedEffect(qrValue) {
-        qrValue?.let { qr ->
-            qrToNavigate = qr
-        }
-    }
-
-    // Mostrar cámara solo si no hay qrValue simulado
-    if (mostrarScanner && qrValue == null) {
-        QrScannerScreen(
-            onQrScanned = { qr ->
-                mostrarScanner = false
-                when (qr) {
-                    "PACKS_DESTACADOS" -> navController.navigate("packsDestacados")
-                    else -> println("QR no reconocido")
-                }
-            }
-            ,
-            onClose = { mostrarScanner = false },
-            modifier = Modifier.fillMaxSize()
-        )
-    }
-
-    // Ejecutar la navegación después de obtener QR
-    qrToNavigate?.let { qr ->
-        LaunchedEffect(qr) {
-            when (qr) {
-                "PACKS_DESTACADOS" -> {
-                    navController.navigate("packsDestacados") {
-                        // launchSingleTop evita abrir varias veces la pantalla
-                        launchSingleTop = true
-                    }
-                }
-                else -> {
-                    println("QR no reconocido: $qr")
-                }
-            }
-            qrToNavigate = null
-        }
-    }
-
-
-
-    Box(modifier = Modifier.fillMaxSize()) {  // Contenedor raíz
-        // 🔹 Contenido principal
+    Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -90,7 +44,7 @@ fun HomeScreen(
                         titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     ),
                     actions = {
-                        IconButton(onClick = { navController.navigate("home?qr=PACKS_DESTACADOS")  }) {
+                        IconButton(onClick = { mostrarScanner = true }) {
                             Icon(
                                 imageVector = Icons.Default.QrCodeScanner,
                                 contentDescription = "Escanear QR"
@@ -157,17 +111,23 @@ fun HomeScreen(
             }
         )
 
-        // 🔹 Scanner por encima de todo el contenido
+        // 🔹 QR Scanner sobre la pantalla
         if (mostrarScanner) {
             QrScannerScreen(
                 onQrScanned = { qr ->
-                    qrToNavigate = qr
                     mostrarScanner = false
+                    if (qr == "PACKS_DESTACADOS") {
+                        navController.navigate("packsDestacados") {
+                            launchSingleTop = true
+                        }
+                    } else {
+                        println("QR no reconocido: $qr")
+                    }
                 },
                 onClose = {
                     mostrarScanner = false
                 },
-                modifier = Modifier.fillMaxSize() // ocupa toda la pantalla
+                modifier = Modifier.fillMaxSize()
             )
         }
     }

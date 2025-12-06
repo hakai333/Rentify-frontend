@@ -44,7 +44,12 @@ fun PacksDestacadosScreen(
             TopAppBar(
                 title = { Text("Packs Destacados") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = {
+                        // Siempre volver a Home
+                        navController.navigate("home") {
+                            popUpTo("home") { inclusive = true }
+                        }
+                    }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Volver a Home"
@@ -52,7 +57,6 @@ fun PacksDestacadosScreen(
                     }
                 }
             )
-
         },
         content = { innerPadding ->
             LazyColumn(
@@ -79,5 +83,4 @@ fun PacksDestacadosScreen(
         }
     )
 }
-
 

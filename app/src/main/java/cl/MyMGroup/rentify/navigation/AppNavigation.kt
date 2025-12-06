@@ -67,19 +67,10 @@ fun AppNavigation() {
             )
         }
 
-        // HomeScreen con QR opcional
-        composable(
-            route = "home?qr={qr}",
-            arguments = listOf(
-                navArgument("qr") {
-                    nullable = true
-                    defaultValue = null
-                }
-            )
-        ) { backStackEntry ->
-            val qrValue: String? = backStackEntry.arguments?.getString("qr") // <-- explícitamente nullable
-            HomeScreen(navController = navController, qrValue)
-        }
+        // HomeScreen
+        composable("home")
+        { backStackEntry ->
+            HomeScreen(navController = navController) }
 
 
         composable("carrito") {

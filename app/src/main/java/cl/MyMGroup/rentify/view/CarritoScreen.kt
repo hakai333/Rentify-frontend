@@ -135,8 +135,8 @@ fun CarritoScreen(
                                     snackbarHostState.showSnackbar("Debes ingresar una dirección")
                                 }
                             } else {
-                                println("DEBUG USUARIO ID -> $usuarioId")
-                                println("DEBUG LOGIN STATE -> $loginState")
+                                //println("DEBUG USUARIO ID -> $usuarioId")
+                                //println("DEBUG LOGIN STATE -> $loginState")
                                 if (usuarioId == null || usuarioId == 0L) {
                                     scope.launch {
                                         snackbarHostState.showSnackbar("Error: usuario no válido")
@@ -154,6 +154,26 @@ fun CarritoScreen(
                             .height(56.dp)
                     ) {
                         Text("Confirmar Compra")
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                cartViewModel.clearCart()
+                                snackbarHostState.showSnackbar("Carrito borrado")
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .padding(top = 8.dp)
+                    ) {
+                        Text("Vaciar Carrito", color = MaterialTheme.colorScheme.onError)
                     }
                 }
             }
